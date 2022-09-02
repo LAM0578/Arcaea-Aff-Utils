@@ -40,6 +40,9 @@ class UtilCore:
         if s == "/affutil affanim2":
             AffTimingUtil.Func_CubeAnim()
             unknown = False
+        if s == "/affutil afftoshadow":
+            AffUtil.Func_AffPathToShadow()
+            unknown = False
         if unknown == True:
             print("未知指令，使用 /help 展示帮助列表\n")
         UtilCore.callCount += 1
@@ -62,6 +65,7 @@ class UtilCore:
             "    /affutil affanim - 获取帧动画 Aff 列表",
             "    /affutil cube - 获取立方体 Aff 列表",
             "    /affutil affanim2 - 获取 Cube 帧动画 Aff 列表",
+            "    /affutil afftoshadow - 将 Aff 片段转换为由 Arc 事件构成的阴影谱面",
             "",
         ]
         count = len(arr)

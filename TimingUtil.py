@@ -389,7 +389,7 @@ class AffTimingUtil:
         print("文件已写入\n")
 
         
-AffTimingUtil.Func_CubeAnim(True)
+# AffTimingUtil.Func_CubeAnim(True)
         
 
         

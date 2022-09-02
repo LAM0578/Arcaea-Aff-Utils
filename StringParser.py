@@ -47,3 +47,35 @@ class StringParser:
 
     def Peek(self, length = 1):
         return self.base[self.pos:self.pos + length]
+
+    def TryReadFloat(self, ternimator = None):
+        try:
+            return self.ReadFloat(ternimator)
+        except:
+            return 0
+
+    def TryReadInt(self, ternimator = None):
+        try:
+            return self.ReadInt(ternimator)
+        except:
+            return 0
+
+    def CanReadFloat(self, ternimator = None):
+        originPos = pos
+        try:
+            self.ReadFloat(ternimator)
+            pos = originPos
+            return True
+        except:
+            pos = originPos
+            return False
+
+    def CanReadInt(self, ternimator = None):
+        originPos = pos
+        try:
+            self.ReadInt(ternimator)
+            pos = originPos
+            return True
+        except:
+            pos = originPos
+            return False
