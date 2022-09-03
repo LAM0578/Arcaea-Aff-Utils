@@ -184,12 +184,6 @@ class AffUtil:
                         anglex = 3600 - anglex
                         group.TimingGroupAttributes[j] = "anglex{0}".format(
                             anglex)
-                    if re.match("angley(\d+)", group.TimingGroupAttributes[j]):
-                        angley = int(
-                            group.TimingGroupAttributes[j].replace("angley"))
-                        angley = 3600 - angley
-                        group.TimingGroupAttributes[j] = "angley{0}".format(
-                            angley)
                     j += 1
 
             # Mirror Notes
