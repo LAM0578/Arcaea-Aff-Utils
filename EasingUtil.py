@@ -74,14 +74,14 @@ class EasingUtil:
         while i < 31:
             print("    {0} - {1}".format(i, EasingUtil.__GetEaseName(i)))
             i += 1
-        return ""
+        print("")
 
     def CalcValue(min, max, x, id):
         p = EasingUtil.GetValue(x, id)
         return min + (max - min) * p
 
     def GetValue(x, id):
-        id = MathUtil.int_tryparse(id)
+        id = MathUtil.IntTryParse(id)
         if type(id) == int:
             return Easings.Ease(x, id)
         elif type(id) == str:

@@ -26,11 +26,11 @@ class ArcNote:
     EndTiming = int(0)
     StartX = float(0)
     EndX = float(0)
-    LineType = ""
+    LineType = "s"
     StartY = float(0)
     EndY = float(0)
     Color = int(0)
-    FxName = ""
+    FxName = "none"
     IsTrace = False
     ArcTaps = []
 
@@ -91,10 +91,22 @@ class EventGroup:
             "timinggroup(", "").replace("){", "").split("_")
         self.TimingGroupAttributes = attributes
 
+    def ResetEvents(self):
+        self.Timings = []
+        self.Taps = []
+        self.Holds = []
+        self.Arcs = []
+        self.Flicks = []
+        self.Cameras = []
+        self.SceneControls = []
+
 
 class Chart:
-    def __init__(self, filePath: str):
-        self.Parse(filePath)
+    def __init__(self, filePath: str = None):
+        if filePath != None:
+            self.AppendLines.clear()
+            self.EventGroups.clear()
+            self.Parse(filePath)
 
     AppendLines = []  # Before "-"
     EventGroups = []  # Every events group will append to here
@@ -122,33 +134,72 @@ class Chart:
                     i += 1
             i = splitLine + 1
             currGroup = EventGroup(0)
+            # Must clear current notes here
+            currGroup.ResetEvents()
+            totalID += 1
             eventGroups.append(currGroup)
+            Timings = []
+            Taps = []
+            Holds = []
+            Arcs = []
+            Flicks = []
+            Cameras = []
+            SceneControls = []
             while i < len(lines):
                 line = lines[i].strip()
                 # Case types and parse
                 if line.startswith("timinggroup("):
+                    # Must clear current notes here
+                    Timings = []
+                    Taps = []
+                    Holds = []
+                    Arcs = []
+                    Flicks = []
+                    Cameras = []
+                    SceneControls = []
                     totalID += 1
-                    currID = totalID
+                    currID = totalID - 1
                     currGroup = EventGroup(totalID)
+                    # Must clear current notes here
+                    currGroup.ResetEvents()
                     currGroup.ParseAttributes(line)
                     eventGroups.append(currGroup)
                 if line.startswith("};"):
                     currID = 0
                 group: EventGroup = eventGroups[currID]
+                if currID == 0:
+                    Timings = group.Timings
+                    Taps = group.Taps
+                    Holds = group.Holds
+                    Arcs = group.Arcs
+                    Flicks = group.Flicks
+                    Cameras = group.Cameras
+                    SceneControls = group.SceneControls
+
                 if line.startswith("timing("):
-                    group.Timings.append(self.ParseTiming(line))
+                    Timings.append(self.ParseTiming(line))
                 elif line.startswith("("):
-                    group.Taps.append(self.ParseTap(line))
+                    Taps.append(self.ParseTap(line))
                 elif line.startswith("hold("):
-                    group.Holds.append(self.ParseHold(line))
+                    Holds.append(self.ParseHold(line))
                 elif line.startswith("arc("):
-                    group.Arcs.append(self.ParseArc(line))
+                    Arcs.append(self.ParseArc(line))
                 elif line.startswith("flick("):
-                    group.Flicks.append(self.ParseFlick(line))
+                    Flicks.append(self.ParseFlick(line))
                 elif line.startswith("camera("):
-                    group.Cameras.append(self.ParseCamera(line))
+                    Cameras.append(self.ParseCamera(line))
                 elif line.startswith("scenecontrol("):
-                    group.SceneControls.append(self.ParseSceneControl(line))
+                    SceneControls.append(self.ParseSceneControl(line))
+
+                group.Timings = Timings
+                group.Taps = Taps
+                group.Holds = Holds
+                group.Arcs = Arcs
+                group.Flicks = Flicks
+                group.Cameras = Cameras
+                group.SceneControls = SceneControls
+
+                eventGroups[currID] = group
                 i += 1
             self.EventGroups = eventGroups
             self.AppendLines = appendLines
@@ -254,6 +305,7 @@ class Chart:
 
 
 class AffWriter:
+
     # Write Events to File
     def WriteEvents(self, writePath: str, chart: Chart):
         with open(writePath, 'w') as file:

@@ -1,13 +1,15 @@
 from array import array
-from Easings import*
-from EasingUtil import*
-from MathUtil import*
-from StringParser import*
-from AffUtil import*
+import AffOption as option
+from Easings import *
+from EasingUtil import *
+from MathUtil import *
+from StringParser import *
+from AffUtil import *
+
 
 class AffTimingUtil:
     # start timing, end timing, start bpm, end bpm, step, ease type
-    def CalcEasingTimings(self,tstart:int,tend:int,bstart:float,bend:float,step:int,easing:str):
+    def CalcEasingTimings(self, tstart: int, tend: int, bstart: float, bend: float, step: int, easing: str):
         result = []
         tseg0 = int((tend - tstart) / step)
         i = 0
@@ -15,13 +17,13 @@ class AffTimingUtil:
         while i <= step:
             p = i / step
             num = EasingUtil.CalcValue(bstart, bend, p, easing)
-            r = "timing({0},%0.2f,4.00);".format(int(tstart + i * tseg0))%num
+            r = "timing({0},%0.2f,4.00);".format(int(tstart + i * tseg0)) % num
             print("    {0}".format(r))
             result.append(r)
             i += 1
         return result
 
-    def CalcOffsetedArc(line:str,offsettiming:int,offsetx:float,offsety:float):
+    def CalcOffsetedArc(line: str, offsettiming: int, offsetx: float, offsety: float):
         # Read context
         s = StringParser(line)
         s.Skip("arc(")
@@ -64,10 +66,10 @@ class AffTimingUtil:
         arctapsstr += ";"
         result = "arc({0},{1},%0.2f,%0.2f,{2},%0.2f,%0.2f,{3},{4},{5}){6}".format(
             timing, endtiming, linetype, color, fx, "true" if isvoid else "false", arctapsstr
-        )%(startx, endx, starty, endy)
+        ) % (startx, endx, starty, endy)
         return result
 
-    def BuildCube(pos:array,size:array,length:int,timing:int,worldpos:bool,stroke:bool):
+    def BuildCube(pos: array, size: array, length: int, timing: int, worldpos: bool, stroke: bool):
         arcarr = []
         startx = float(pos[0]) - float(size[0]) / 2
         endx = float(pos[0]) + float(size[0]) / 2
@@ -77,39 +79,59 @@ class AffTimingUtil:
             startx = startx * 0.5
             endx = endx * 0.5
         # Build front
-        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing)%(startx,endx,starty,starty))
-        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing)%(startx,endx,endy,endy))
-        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing)%(startx,startx,starty,endy))
-        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing)%(endx,endx,starty,endy))
+        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+            timing, timing) % (startx, endx, starty, starty))
+        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+            timing, timing) % (startx, endx, endy, endy))
+        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+            timing, timing) % (startx, startx, starty, endy))
+        arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+            timing, timing) % (endx, endx, starty, endy))
         if stroke == True:
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing)%(startx,endx,starty,endy))
+            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                timing, timing) % (startx, endx, starty, endy))
         # Build Cube if length != 0
         if length != 0:
             # Copy front with offset
             i = 0
             while i < 4:
-                arcarr.append(AffTimingUtil.CalcOffsetedArc(arcarr[i], length, 0, 0))
+                arcarr.append(AffTimingUtil.CalcOffsetedArc(
+                    arcarr[i], length, 0, 0))
                 i += 1
             # Build z-axis
-            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(startx,startx,starty,starty))
-            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(endx,endx,starty,starty))
-            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(startx,startx,endy,endy))
-            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(endx,endx,endy,endy))
+            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                timing, timing + length) % (startx, startx, starty, starty))
+            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                timing, timing + length) % (endx, endx, starty, starty))
+            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                timing, timing + length) % (startx, startx, endy, endy))
+            arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                timing, timing + length) % (endx, endx, endy, endy))
             if stroke == True:
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing + length, timing + length)%(startx,endx,endy,starty))
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(startx,startx,endy,starty))
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(endx,endx,starty,endy))
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(startx,endx,endy,endy))
-                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(timing, timing + length)%(endx,startx,starty,starty))
+                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                    timing + length, timing + length) % (startx, endx, endy, starty))
+                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                    timing, timing + length) % (startx, startx, endy, starty))
+                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                    timing, timing + length) % (endx, endx, starty, endy))
+                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                    timing, timing + length) % (startx, endx, endy, endy))
+                arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
+                    timing, timing + length) % (endx, startx, starty, starty))
         return arcarr
 
     def Func_GetTimings():
-        arr0 = input("\n按格式输入:\n    开始时间 结束时间 开始Bpm 结束Bpm 拟合精度 缓动类型\n").split(" ")
+        arr0 = input(
+            "\n按格式输入:\n    开始时间 结束时间 开始Bpm 结束Bpm 拟合精度 缓动类型\n").split(" ")
         timingarr = AffTimingUtil.CalcEasingTimings(
-            int(arr0[0]),int(arr0[1]),float(arr0[2]),float(arr0[3]),int(arr0[4]),arr0[5],
+            int(arr0[0]), int(arr0[1]), float(arr0[2]), float(
+                arr0[3]), int(arr0[4]), arr0[5],
         )
-        p = input("\n输入文件路径:\n")
-        with open(p, 'w') as f:
+        if option.UseCustomForcePath == True:
+            outpath = option.OutPath
+        else:
+            outpath = input("\n输入输出文件路径:\n").replace("\\","/")
+        with open(outpath, 'w') as f:
             i = 0
             size = len(timingarr)
             while i < size:
@@ -117,12 +139,16 @@ class AffTimingUtil:
                 i += 1
         print("文件已写入\n")
 
-    def Func_OffsetAff(debug:bool = False):
+    def Func_OffsetAff():
         # Based settings
-        inpath = "F:/adetest/44.aff" if debug == True else input("\n输入原始Arc片段文件路径:\n")
-        outpath = "F:/adetest/4.aff" if debug == True else input("\n输入输出Arc片段文件路径:\n")
+        if option.UseCustomForcePath == True:
+            inpath = option.FilePath
+            outpath = option.OutPath
+        else:
+            inpath = input("\n输入原始Arc片段文件路径:\n").replace("\\","/")
+            outpath = input("\n输入输出Arc片段文件路径:\n").replace("\\","/")
         # Animation settings
-        arr = "1.38 0 500 30 8 outsine true".split(" ") if debug == True else input(
+        arr = input(
             "\n按格式输入:\n    偏移x 偏移y 动画时长 拟合精度 缓动类型 在每个循环添加开始组\n"
         ).split(" ")
         offsetx = float(arr[0])
@@ -151,16 +177,19 @@ class AffTimingUtil:
                             if l == 0:
                                 lp = loop
                             r = lp % 2
-                            arcstr = AffTimingUtil.CalcOffsetedArc(line, int(duration / loop * lp), offsetx * r, offsety * r)
+                            arcstr = AffTimingUtil.CalcOffsetedArc(
+                                line, int(duration / loop * lp), offsetx * r, offsety * r)
                             exarcarr.append(arcstr)
                         currpos = ""
                         s = 0
                         while s < step:
-                            p = EasingUtil.GetValue(float(1 / step * s), easing)
+                            p = EasingUtil.GetValue(
+                                float(1 / step * s), easing)
                             if l % 2 != 0:
                                 p = 1 - p
                             offsett = duration / loop / step * s + duration / loop * l
-                            arcstr = AffTimingUtil.CalcOffsetedArc(line, int(offsett), offsetx * p, offsety * p)
+                            arcstr = AffTimingUtil.CalcOffsetedArc(
+                                line, int(offsett), offsetx * p, offsety * p)
                             if arcstr in arcarr == False and AffUtil.GetArcPosition(arcstr) != currpos:
                                 arcarr.append(arcstr)
                                 currpos = AffUtil.GetArcPosition(arcstr)
@@ -181,39 +210,50 @@ class AffTimingUtil:
             i = 0
             while i < size:
                 line = arcarr[i]
-                w.writelines("timinggroup({0}){{\n".format("noinput" if i != size - 1 else ""))
+                w.writelines("timinggroup({0}){{\n".format(
+                    "noinput" if i != size - 1 else ""))
                 if i <= 0:
                     j = 0
                     while j < int(len(timingarr)):
                         w.writelines("  {0}\n".format(timingarr[j]))
-                        w.writelines("  scenecontrol({0},hidegroup,0.00,1);\n".format(AffUtil.GetEventStartTiming(arcarr[i], "arc(")))
+                        w.writelines("  scenecontrol({0},hidegroup,0.00,1);\n".format(
+                            AffUtil.GetEventStartTiming(arcarr[i], "arc(")))
                         j += 1
                 else:
-                    showtiming = AffUtil.GetEventStartTiming(arcarr[i - 1], "arc(")
+                    showtiming = AffUtil.GetEventStartTiming(
+                        arcarr[i - 1], "arc(")
                     hidetiming = AffUtil.GetEventStartTiming(arcarr[i], "arc(")
                     if i < size - 1:
                         w.writelines("  timing(0,100.00,4.00);\n")
-                        w.writelines("  timing({0},999999.00,4.00);\n".format(showtiming - 1))
-                        w.writelines("  timing({0},0.00,4.00);\n".format(showtiming))
-                        w.writelines("  timing({0},100.00,4.00);\n".format(hidetiming))
-                        w.writelines("  scenecontrol({0},hidegroup,0.00,1);\n".format(hidetiming))
+                        w.writelines(
+                            "  timing({0},999999.00,4.00);\n".format(showtiming - 1))
+                        w.writelines(
+                            "  timing({0},0.00,4.00);\n".format(showtiming))
+                        w.writelines(
+                            "  timing({0},100.00,4.00);\n".format(hidetiming))
+                        w.writelines(
+                            "  scenecontrol({0},hidegroup,0.00,1);\n".format(hidetiming))
                     else:
                         j = 0
                         while j < int(len(timingarr)):
                             w.writelines("  {0}\n".format(timingarr[j]))
                             j += 1
                         w.writelines("  scenecontrol(0,hidegroup,0.00,1);\n")
-                        w.writelines("  scenecontrol({0},hidegroup,0.00,0);\n".format(showtiming))
+                        w.writelines(
+                            "  scenecontrol({0},hidegroup,0.00,0);\n".format(showtiming))
                 w.writelines("  {0}\n".format(line))
                 w.writelines("};\n")
                 i += 1
         print("文件已写入\n")
-                
-    def Func_Cube(debug:bool = False):
+
+    def Func_Cube():
         # Based settings
-        outpath = "F:/adetest/4.aff" if debug == True else input("\n输入输出Arc片段文件路径:\n")
+        if option.UseCustomForcePath == True:
+            outpath = option.OutPath
+        else:
+            outpath = input("\n输入输出Arc片段文件路径:\n").replace("\\","/")
         # Create Cube
-        arr = "0.5,0.5 1,1 300 false true".split(" ") if debug == True else input(
+        arr = input(
             "\n按格式输入:\n    位置 大小 长度 使用世界坐标 三角描边\n" +
             "    例: 0.5,0.5 1,1 300 false true\n"
         ).split(" ")
@@ -223,22 +263,26 @@ class AffTimingUtil:
         length = int(arr[2])
         worldpos = arr[3].lower() == "true"
         stroke = arr[4].lower() == "true"
-        timing = int("9600" if debug == True else input("输入开始时间:\n"))
+        timing = int(input("输入开始时间:\n"))
         # Build Cube
-        arcarr = AffTimingUtil.BuildCube(pos,size,length,timing,worldpos,stroke)
+        arcarr = AffTimingUtil.BuildCube(
+            pos, size, length, timing, worldpos, stroke)
         with open(outpath, 'w') as w:
             i = 0
             while i < int(len(arcarr)):
                 w.writelines("{0}\n".format(arcarr[i]))
                 i += 1
-        print("文件已写入\n")
+        print("\n文件已写入\n")
 
-    def Func_CubeAnim(debug:bool = False):
+    def Func_CubeAnim():
         # Based settings
-        outpath = "F:/adetest/4.aff" if debug == True else input("\n输入输出Arc片段文件路径:\n")
+        if option.UseCustomForcePath == True:
+            outpath = option.OutPath
+        else:
+            outpath = input("\n输入输出Arc片段文件路径:\n").replace("\\","/")
         # Animation settings
         # startpos endpos startsize endsize stroke
-        arr = "0,0.5 1,1 1,1,200 0.5,0.5,100 true".split(" ") if debug == True else input(
+        arr = input(
             "\n按格式输入:\n    开始位置 结束位置 开始大小 结束大小 三角描边\n" +
             "    例: 0,0.5 1,1 1,1,200 0.5,0.5,100 true\n"
         ).split(" ")
@@ -248,7 +292,7 @@ class AffTimingUtil:
         endsize = arr[3].split(",")
         stroke = arr[4].lower() == "true"
         # starttiming duration step loop easing addgroup
-        arr = "1000 2000 120 1 outquad true".split(" ") if debug == True else input(
+        arr = input(
             "\n按格式输入:\n    开始时间 持续时间 拟合精度 循环次数 缓动类型 在每个循环添加开始组\n" +
             "    例: 1000 2000 120 1 outquad true\n"
         ).split(" ")
@@ -262,7 +306,7 @@ class AffTimingUtil:
         arcgroups = []
         timings = []
         exgroups = []
-        # Get each Cube frame 
+        # Get each Cube frame
         startposx = float(startpos[0])
         startposy = float(startpos[1])
         endposx = float(endpos[0])
@@ -289,9 +333,10 @@ class AffTimingUtil:
                 sy = startsizey if r != 0 else endsizey
                 l = startlength if r != 0 else endlength
                 t = starttiming + duration / loop * loopcount + offsetlength
-                pos = "{0},{1}".format(x,y).split(",")
-                size = "{0},{1}".format(sx,sy).split(",")
-                exgroups.append(AffTimingUtil.BuildCube(pos,size,int(l),int(t),False,stroke))
+                pos = "{0},{1}".format(x, y).split(",")
+                size = "{0},{1}".format(sx, sy).split(",")
+                exgroups.append(AffTimingUtil.BuildCube(
+                    pos, size, int(l), int(t), False, stroke))
             stepcount = 0
             currtimings = []
             fix = 0
@@ -313,7 +358,8 @@ class AffTimingUtil:
                     fix = (timing - offsetlength) - currtimings[stepcount - 1]
                 timing -= fix
                 currtimings.append(int(timing - offsetlength + fix))
-                arcgroups.append(AffTimingUtil.BuildCube(pos,size,int(length),int(timing),False,stroke))
+                arcgroups.append(AffTimingUtil.BuildCube(
+                    pos, size, int(length), int(timing), False, stroke))
                 stepcount += 1
             timingcount = 0
             # Fix timings
@@ -334,17 +380,25 @@ class AffTimingUtil:
                 hidetiming = timings[i]
                 showduration = int(hidetiming - showtiming)
                 lines.append("  timing(0,%0.2f,4.00);" % (bpm))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(showtiming)) % (-bpm * offsetlength))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(showtiming + 1)) % (0))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(hidetiming)) % (-bpm * offsetlength))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(hidetiming + 1)) % (bpm))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(showtiming + offsetlength - 1)) % (bpm * showduration))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(showtiming + offsetlength)) % (bpm))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(showtiming)) % (-bpm * offsetlength))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(showtiming + 1)) % (0))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(hidetiming)) % (-bpm * offsetlength))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(hidetiming + 1)) % (bpm))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(showtiming + offsetlength - 1)) % (bpm * showduration))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(showtiming + offsetlength)) % (bpm))
             else:
                 t = timings[0]
                 lines.append("  timing(0,%0.2f,4.00);" % (bpm))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(t)) % (-bpm * offsetlength))
-                lines.append("  timing({0},%0.2f,4.00);".format(int(t + 1)) % (bpm))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(t)) % (-bpm * offsetlength))
+                lines.append("  timing({0},%0.2f,4.00);".format(
+                    int(t + 1)) % (bpm))
             j = 0
             while j < int(len(arcgroups[i])):
                 line = arcgroups[i][j]
@@ -377,21 +431,16 @@ class AffTimingUtil:
                     while j < int(len(exgroups[i])):
                         group = exgroups[i]
                         arcstr = group[j]
-                        timing = AffUtil.GetEventStartTiming(arcstr.strip(),"arc(") - offsetlength
+                        timing = AffUtil.GetEventStartTiming(
+                            arcstr.strip(), "arc(") - offsetlength
                         lines.append("  timing(0,%0.2f,4.00);" % (bpm))
-                        lines.append("  timing({0},%0.2f,4.00);".format(int(timing)) % (-bpm * offsetlength))
-                        lines.append("  timing({0},%0.2f,4.00);".format(int(timing + 1)) % (bpm))
+                        lines.append("  timing({0},%0.2f,4.00);".format(
+                            int(timing)) % (-bpm * offsetlength))
+                        lines.append("  timing({0},%0.2f,4.00);".format(
+                            int(timing + 1)) % (bpm))
                         lines.append("  {0}".format(arcstr))
                         j += 1
                     i += 1
 
-
-        print("文件已写入\n")
-
-        
-# AffTimingUtil.Func_CubeAnim(True)
-        
-
-        
-
+        print("\n文件已写入\n")
 

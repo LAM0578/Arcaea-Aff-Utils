@@ -10,14 +10,15 @@ class UtilCore:
         unknown = True
         if UtilCore.callCount == 0:
             print("使用 /help 展示帮助列表\n")
+            print("编辑 AffOption.py 来修改选项\n")
         s = input()
         if s == "/quit":
             return
         if s == "/help":
-            print(UtilCore.Help())
+            UtilCore.Help()
             unknown = False
         if s == "/ease tips":
-            print(EasingUtil.GetTips())
+            EasingUtil.GetTips()
             unknown = False
         if re.match("/ease (calc|value) (\d+(\.?)(\d+)?) (\d+(\.?)(\d+)?) (\d+(\.?)(\d+)?) (\d+)", s):
             m0arr = s.replace("/ease", "").replace("calc ", "").replace("value ", "").split(" ")
@@ -46,6 +47,9 @@ class UtilCore:
         if s == "/affutil affmirror":
             AffUtil.Func_Mirror()
             unknown = False
+        if s == "/affutil affreverse":
+            AffUtil.Func_Reverse()
+            unknown = False
         if unknown == True:
             print("未知指令，使用 /help 展示帮助列表\n")
         UtilCore.callCount += 1
@@ -70,12 +74,12 @@ class UtilCore:
             "    /affutil affanim2 - 获取 Cube 帧动画 Aff 列表",
             "    /affutil afftoshadow - 将 Aff 片段转换为由 Arc 事件构成的阴影谱面",
             "    /affutil affmirror - 镜像谱面",
+            "    /affutil affreverse - 颠倒谱面",
             "",
         ]
         count = len(arr)
         while i < count:
             print(arr[i])
             i += 1
-        return ""
 
 UtilCore.Main()
