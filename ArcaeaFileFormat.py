@@ -1,5 +1,5 @@
 # This file is used for parse Arcaea chart file
-from StringParser import StringParser
+from Utils.StringParser import StringParser
 
 
 # Base

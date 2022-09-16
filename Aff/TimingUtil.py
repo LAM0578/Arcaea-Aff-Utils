@@ -1,11 +1,9 @@
-from array import array
 import AffOption as option
-from Easings import *
-from EasingUtil import *
-from MathUtil import *
-from StringParser import *
-from AffUtil import *
-
+from Easing.Easings import *
+from Easing.EasingUtil import *
+from Utils.MathUtil import *
+from Utils.StringParser import *
+from Aff.AffUtil import *
 
 class AffTimingUtil:
     # start timing, end timing, start bpm, end bpm, step, ease type
@@ -69,7 +67,7 @@ class AffTimingUtil:
         ) % (startx, endx, starty, endy)
         return result
 
-    def BuildCube(pos: array, size: array, length: int, timing: int, worldpos: bool, stroke: bool):
+    def BuildCube(pos: list, size: list, length: int, timing: int, worldpos: bool, stroke: bool):
         arcarr = []
         startx = float(pos[0]) - float(size[0]) / 2
         endx = float(pos[0]) + float(size[0]) / 2

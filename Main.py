@@ -1,6 +1,7 @@
-from Easings import*
-from EasingUtil import* 
-from TimingUtil import*
+from Easing.Easings import*
+from Easing.EasingUtil import* 
+from Aff.TimingUtil import*
+from Aff.AffCameraUtil import*
 import re
 
 class UtilCore:
@@ -50,6 +51,9 @@ class UtilCore:
         if s == "/affutil affreverse":
             AffUtil.Func_Reverse()
             unknown = False
+        if s == "/affutil convert0":
+            AffCameraUtil.Func_ConvertFlickToCameras()
+            unknown = False
         if unknown == True:
             print("未知指令，使用 /help 展示帮助列表\n")
         UtilCore.callCount += 1
@@ -75,6 +79,7 @@ class UtilCore:
             "    /affutil afftoshadow - 将 Aff 片段转换为由 Arc 事件构成的阴影谱面",
             "    /affutil affmirror - 镜像谱面",
             "    /affutil affreverse - 颠倒谱面",
+            "    /affutil convert0 - Flick 转换 Camera 移动事件",
             "",
         ]
         count = len(arr)

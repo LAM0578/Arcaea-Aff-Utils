@@ -1,6 +1,5 @@
-from asyncio.windows_events import NULL
-from Easings import*
-from MathUtil import*
+from Utils.MathUtil import MathUtil
+from Easing.Easings import*
 
 class EasingUtil:
     
@@ -81,7 +80,7 @@ class EasingUtil:
         return min + (max - min) * p
 
     def GetValue(x, id):
-        id = MathUtil.IntTryParse(id)
+        id = MathUtil.TryParseInt(id)
         if type(id) == int:
             return Easings.Ease(x, id)
         elif type(id) == str:

@@ -1,10 +1,9 @@
 import math
-from MathUtil import MathUtil
-from StringParser import *
+from Utils.MathUtil import*
+from Utils.StringParser import *
 import ArcaeaFileFormat as Aff
 import AffOption as option
 import re
-
 
 class ArcAlgorithm:
     # Easing Base

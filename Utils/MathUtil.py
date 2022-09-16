@@ -1,17 +1,15 @@
-
 import math
-
 
 class MathUtil:
     # Try parse input to int. If fail, return input self.
-    def IntTryParse(x):
+    def TryParseInt(x):
         try:
             return int(x)
         except:
             return x
 
     # Try parse input to float. If fail, return input self.
-    def FloatTryParse(x):
+    def TryParseFloat(x):
         try:
             return float(x)
         except:
