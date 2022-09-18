@@ -3,6 +3,7 @@ from Easing.Easings import *
 from Easing.EasingUtil import *
 from Utils.MathUtil import *
 from Utils.StringParser import *
+from Utils.ParserUtil import*
 from Aff.AffUtil import *
 
 class AffTimingUtil:
@@ -155,7 +156,7 @@ class AffTimingUtil:
         step = int(arr[3])
         loop = int(arr[4])
         easing = arr[5]
-        addgroup = arr[6].lower() == "true"
+        addgroup = ParseUtil.ParseBool(arr[6])
         # Generate animation
         arcarr = []
         exarcarr = []
@@ -259,8 +260,8 @@ class AffTimingUtil:
         pos[0] = "{0}".format(float(pos[0]) * 2)
         size = arr[1].split(",")
         length = int(arr[2])
-        worldpos = arr[3].lower() == "true"
-        stroke = arr[4].lower() == "true"
+        worldpos = ParseUtil.ParseBool(arr[3])
+        stroke = ParseUtil.ParseBool(arr[4])
         timing = int(input("输入开始时间:\n"))
         # Build Cube
         arcarr = AffTimingUtil.BuildCube(
@@ -288,7 +289,7 @@ class AffTimingUtil:
         endpos = arr[1].split(",")
         startsize = arr[2].split(",")
         endsize = arr[3].split(",")
-        stroke = arr[4].lower() == "true"
+        stroke = ParseUtil.ParseBool(arr[4])
         # starttiming duration step loop easing addgroup
         arr = input(
             "\n按格式输入:\n    开始时间 持续时间 拟合精度 循环次数 缓动类型 在每个循环添加开始组\n" +
@@ -299,7 +300,7 @@ class AffTimingUtil:
         step = int(arr[2])
         loop = int(arr[3])
         easing = arr[4]
-        addgroup = arr[5].lower() == "true"
+        addgroup = ParseUtil.ParseBool(arr[5])
         # Build Animation
         arcgroups = []
         timings = []

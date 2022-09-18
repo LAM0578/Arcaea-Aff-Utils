@@ -1,6 +1,6 @@
 import math
 from Utils.MathUtil import*
-from Utils.StringParser import *
+from Utils.StringParser import*
 import ArcaeaFileFormat as Aff
 import AffOption as option
 import re

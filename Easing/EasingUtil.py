@@ -1,4 +1,4 @@
-from Utils.MathUtil import MathUtil
+from Utils.ParseUtil import*
 from Easing.Easings import*
 
 class EasingUtil:
@@ -80,7 +80,7 @@ class EasingUtil:
         return min + (max - min) * p
 
     def GetValue(x, id):
-        id = MathUtil.TryParseInt(id)
+        id = ParseUtil.TryParseInt(id)
         if type(id) == int:
             return Easings.Ease(x, id)
         elif type(id) == str:

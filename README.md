@@ -8,6 +8,11 @@ Arcaea 谱面编辑辅助工具
 
 # 更新日志
 
+> 2022/9/18
+- 添加了 ParseUtil
+- 修改了所有转换 bool 的部分
+  - 修改后使用的 ParseUtil.ParseBool()
+
 > 2022/9/17
 - 添加了 AffCameraUtil
   - 添加了 Flick 转换 Camera 移动事件
