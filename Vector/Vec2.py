@@ -1,3 +1,4 @@
+
 class Vec2:
     def __init__(self,x:float=None,y:float=None):
         if (x != None and y != None) or \

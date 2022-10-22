@@ -10,6 +10,8 @@ import math
 class AffCameraUtil:
     __OriginPos = Vec3(0, 990, 0)
 
+    # Method
+
     def GetFlickOffsetMove(
         filepath: str,
         outpath: str,
@@ -70,6 +72,8 @@ class AffCameraUtil:
         chart.EventGroups.append(eventgroup)
         AffWriter.WriteEvents(AffWriter,outpath,chart)
         print("\n文件已写入\n")
+
+    # Function
 
     def Func_ConvertFlickToCameras():
         filepath = input('\n请输入文件路径:\n').replace("\\","/")

@@ -3,7 +3,7 @@ from Easing.Easings import *
 from Easing.EasingUtil import *
 from Utils.MathUtil import *
 from Utils.StringParser import *
-from Utils.ParserUtil import*
+from Utils.ParseUtil import*
 from Aff.AffUtil import *
 
 class AffTimingUtil:
@@ -11,15 +11,13 @@ class AffTimingUtil:
     def CalcEasingTimings(self, tstart: int, tend: int, bstart: float, bend: float, step: int, easing: str):
         result = []
         tseg0 = int((tend - tstart) / step)
-        i = 0
         print("\n输出:")
-        while i <= step:
+        for i in range(step):
             p = i / step
             num = EasingUtil.CalcValue(bstart, bend, p, easing)
             r = "timing({0},%0.2f,4.00);".format(int(tstart + i * tseg0)) % num
             print("    {0}".format(r))
             result.append(r)
-            i += 1
         return result
 
     def CalcOffsetedArc(line: str, offsettiming: int, offsetx: float, offsety: float):
@@ -57,10 +55,8 @@ class AffTimingUtil:
         arctapsstr = ""
         if arctaps != []:
             arctapsstr += "["
-            i = 0
-            while i < len(arctaps):
-                arctapsstr += "arctap({0}),".format(arctaps[i])
-                i += 1
+            for at in arctaps:
+                arctapsstr += "arctap({0}),".format(at)
             arctapsstr += "]"
         arctapsstr += ";"
         result = "arc({0},{1},%0.2f,%0.2f,{2},%0.2f,%0.2f,{3},{4},{5}){6}".format(
@@ -92,11 +88,9 @@ class AffTimingUtil:
         # Build Cube if length != 0
         if length != 0:
             # Copy front with offset
-            i = 0
-            while i < 4:
+            for i in range(4):
                 arcarr.append(AffTimingUtil.CalcOffsetedArc(
                     arcarr[i], length, 0, 0))
-                i += 1
             # Build z-axis
             arcarr.append("arc({0},{1},%0.2f,%0.2f,s,%0.2f,%0.2f,0,none,true);".format(
                 timing, timing + length) % (startx, startx, starty, starty))
@@ -131,11 +125,8 @@ class AffTimingUtil:
         else:
             outpath = input("\n输入输出文件路径:\n").replace("\\","/")
         with open(outpath, 'w') as f:
-            i = 0
-            size = len(timingarr)
-            while i < size:
-                f.writelines("{0}\n".format(timingarr[i]))
-                i += 1
+            for t in timingarr:
+                f.writelines("{0}\n".format(t))
         print("文件已写入\n")
 
     def Func_OffsetAff():
@@ -163,14 +154,11 @@ class AffTimingUtil:
         timingarr = []
         with open(inpath, 'r') as f:
             lines = f.readlines()
-            i = 0
-            linesize = int(len(lines))
             duration *= loop
-            while i < linesize:
-                line = lines[i].strip().replace("\n", "")
+            for line in lines:
+                line = lines.strip().replace("\n", "")
                 if line.startswith("arc(") == True:
-                    l = 0
-                    while l < loop:
+                    for l in range(loop):
                         if addgroup == True:
                             lp = l
                             if l == 0:
@@ -180,8 +168,7 @@ class AffTimingUtil:
                                 line, int(duration / loop * lp), offsetx * r, offsety * r)
                             exarcarr.append(arcstr)
                         currpos = ""
-                        s = 0
-                        while s < step:
+                        for s in range(step):
                             p = EasingUtil.GetValue(
                                 float(1 / step * s), easing)
                             if l % 2 != 0:
@@ -192,11 +179,9 @@ class AffTimingUtil:
                             if arcstr in arcarr == False and AffUtil.GetArcPosition(arcstr) != currpos:
                                 arcarr.append(arcstr)
                                 currpos = AffUtil.GetArcPosition(arcstr)
-                            s += 1
-                        l += 1
                 elif line.startswith("timing(") == True:
                     timingarr.append(line)
-                i += 1
+                    
         with open(outpath, 'w') as w:
             size = 0
             if addgroup == True:
@@ -370,8 +355,7 @@ class AffTimingUtil:
             loopcount += 1
         # Build timing groups
         timinggroups = []
-        i = 0
-        while i < int(len(timings)):
+        for i in range(len(timings)):
             lines = []
             lines.append("timinggroup(noinput){")
             if i > 0:
@@ -398,36 +382,27 @@ class AffTimingUtil:
                     int(t)) % (-bpm * offsetlength))
                 lines.append("  timing({0},%0.2f,4.00);".format(
                     int(t + 1)) % (bpm))
-            j = 0
-            while j < int(len(arcgroups[i])):
+            for j in range(len(arcgroups[i])):
                 line = arcgroups[i][j]
                 lines.append("  {0}".format(line))
-                j += 1
             lines.append("};")
             timinggroups.append(lines)
-            i += 1
+
         # Write to file
         with open(outpath, 'w') as w:
-            i = 0
-            while i < int(len(timinggroups)):
+            for i in range(len(timinggroups)):
                 tg = timinggroups[i]
                 if addgroup == False and step % 2 == 0 and i % step == 0 and i > 0:
-                    i += 1
                     continue
-                j = 0
-                while j < int(len(tg)):
+                for j in len(tg):
                     if j > 0 and tg[j] == tg[j - 1]:
                         continue
                     w.write(tg[j])
                     w.write("\n")
-                    j += 1
-                i += 1
             if addgroup == True and exgroups != []:
                 lines = []
-                i = 0
-                while i < int(len(exgroups)):
-                    j = 0
-                    while j < int(len(exgroups[i])):
+                for i in len(exgroups):
+                    for j in len(exgroups[i]):
                         group = exgroups[i]
                         arcstr = group[j]
                         timing = AffUtil.GetEventStartTiming(
@@ -438,8 +413,6 @@ class AffTimingUtil:
                         lines.append("  timing({0},%0.2f,4.00);".format(
                             int(timing + 1)) % (bpm))
                         lines.append("  {0}".format(arcstr))
-                        j += 1
-                    i += 1
 
         print("\n文件已写入\n")
 

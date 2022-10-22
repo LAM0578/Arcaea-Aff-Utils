@@ -15,7 +15,7 @@ class ArcAlgorithm:
         return start + (end - start) * (1 - math.cos(1.5707963 * t))
 
     def In(self, start: float, end: float, t: float):
-        return start + (end - start) * (math.cos(1.5707963 * t))
+        return start + (end - start) * (math.sin(1.5707963 * t))
 
     def Both(self, start: float, end: float, t: float):
         o = float(1 - t)
@@ -27,11 +27,11 @@ class ArcAlgorithm:
         linetype = linetype.strip().lower()
         if linetype == "s":
             return self.Straight(self, start, end, t)
-        if linetype == "b":
+        elif linetype == "b":
             return self.Both(self, start, end, t)
-        if linetype == "si" or linetype == "sisi" or linetype == "siso":
+        elif linetype == "si" or linetype == "sisi" or linetype == "siso":
             return self.In(self, start, end, t)
-        if linetype == "so" or linetype == "sosi" or linetype == "soso":
+        elif linetype == "so" or linetype == "sosi" or linetype == "soso":
             return self.Out(self, start, end, t)
         return self.Straight(self, start, end, t)
 
@@ -39,11 +39,11 @@ class ArcAlgorithm:
         linetype = linetype.strip().lower()
         if linetype == "s" or linetype == "si" or linetype == "so":
             return self.Straight(self, start, end, t)
-        if linetype == "b":
+        elif linetype == "b":
             return self.Both(self, start, end, t)
-        if linetype == "sisi" or linetype == "sosi":
+        elif linetype == "sisi" or linetype == "sosi":
             return self.In(self, start, end, t)
-        if linetype == "siso" or linetype == "soso":
+        elif linetype == "siso" or linetype == "soso":
             return self.Out(self, start, end, t)
         return self.Straight(self, start, end, t)
 
@@ -54,6 +54,15 @@ class ArcAlgorithm:
         y = self.ArcY(self, start[1], end[1], t, linetype)
         return [x, y]
 
+class FileUtil:
+    def GetInputPath() -> list:
+        if option.UseCustomForcePath == True:
+            filePath = option.FilePath
+            outPath = option.OutPath
+        else:
+            filePath = input("\n输入文件路径:\n").replace("\\","/")
+            outPath = input("\n输入输出路径:\n").replace("\\","/")
+        return [filePath,outPath]
 
 class AffUtil:
 
@@ -510,31 +519,189 @@ class AffUtil:
         Aff.AffWriter.WriteEvents(Aff.AffWriter,outPath,chart)
         print("\n文件已写入\n")
 
+    def ConvertToKey(self,filePath:str,outPath:str):
+        # Load chart.
+        chart = Aff.Chart(filePath)
+
+        # Note track in arc x pos.
+        trackPos = [-0.75,-0.25,0.25,0.75,1.25,1.75]
+
+        # For each group of all groups and for each note in group.
+        AllTaps = []
+        AllHolds = []
+
+        # Local Methods.
+
+        def checkEventOverlap(timing,track,endTiming=-1) -> bool:
+            # Assign note.
+            isHold = endTiming != -1
+            note = Aff.TapNote()
+            if isHold:
+                note = Aff.HoldNote()
+            note.Timing = timing
+            note.Track = track
+            if isHold:
+                note.EndTiming = endTiming
+            # Check note is overlap or to close.
+            # If overlap or to close, return false.
+            for n in AllTaps:
+                if math.fabs(note.Timing - n.Timing) < 25:
+                    return True
+            for n in AllHolds:
+                # If note timing in hold range, return false.
+                if note.Timing > n.Timing and note.Timing < n.EndTiming:
+                    return True
+            return False
+
+        def findNearAbleLane(timing, track): # -> int | bool
+            notes = []
+            # Find all nearest note.
+            for n in AllTaps:
+                if math.fabs(n.Timing - timing) < 25:
+                    notes.append(n)
+            for n in AllHolds:
+                if math.fabs(n.Timing - timing) < 25 or math.fabs(n.EndTiming - timing) < 25:
+                    notes.append(n)
+            # Compare notes.
+            result = track
+            if result is None:
+                return False
+            tryResult = []
+            # Loop 5 times in notes.
+            for i in range(6):
+                for n in notes:
+                    if n.Track == result:
+                        result += 1
+                        result %= 5
+                if result not in tryResult:
+                    tryResult.append(result)
+            # If sorted result is full, return false.
+            if sorted(tryResult) == [0,1,2,3,4,5]:
+                return False
+            # Else, return result.
+            return result
+
+        # Return the nearest track by x pos.
+        def getNearestTrack(x) -> int:
+            for pos in trackPos:
+                if abs(x - pos) <= 0.5:
+                    result = trackPos.index(pos)
+                    if x > 0.5 and result < 5:
+                        return result + 1
+                    return result
+
+        # First foreach group is used to add note.
+        for group in chart.EventGroups:
+            # If group item type isnt Aff.EventGroup, we dont edit it.
+            if type(group) is Aff.EventGroup:
+                for n in group.Taps:
+                    AllTaps.append(n)
+                for n in group.Holds:
+                    AllHolds.append(n)
+
+        # Second foreach group is used to convert note.
+        for group in chart.EventGroups:
+            # Because Tap and Hold is in lane, so we dont edit them.
+            # But we will add item to them.
+            # If group item type isnt Aff.EventGroup, we dont edit it.
+            if type(group) is Aff.EventGroup:
+                Taps = group.Taps
+                Holds = group.Holds
+                # For each Arc in Arcs.
+                for a in group.Arcs:
+                    if type(a) is Aff.ArcNote:
+
+                        # Return a value between arc startX and arc endX.
+                        def getPosXAt(timing) -> float:
+                            return ArcAlgorithm.ArcX(
+                                ArcAlgorithm, a.StartX, a.EndX, timing, a.LineType)
+
+                        # If arc is tance arc, we will convert arctaps to taps.
+                        if a.IsTrace:
+                            for at in a.ArcTaps:
+                                # Get pos x.
+                                posX = getPosXAt(at)
+                                # Convert pos to note track.
+                                track = getNearestTrack(posX)
+                                # Check track is invalid.
+                                # If track is uninvalid, continue.
+                                if checkEventOverlap(at,track):
+                                    track = findNearAbleLane(at,track)
+                                    if track == False:
+                                        continue
+                                # If track is invalid, convert it to tap note and add to list.
+                                n = Aff.TapNote()
+                                n.Timing = at
+                                n.Track = track
+                                AllTaps.append(n)
+                                Taps.append(n)
+                        else:
+                            # Convert pos to note track.
+                            track = getNearestTrack(a.StartX)
+                            # Check track is invalid.
+                            # If track is uninvalid, continue.
+                            if checkEventOverlap(a.Timing,track,a.EndTiming):
+                                track = findNearAbleLane(a.Timing,track)
+                                if track == False:
+                                    continue
+                            # If track is invalid, convert it to hold note and add to list.
+                            n = Aff.HoldNote()
+                            n.Timing = a.Timing
+                            n.Track = track
+                            n.EndTiming = a.EndTiming
+                            AllHolds.append(n)
+                            Holds.append(n)
+
+                    for f in group.Flicks:
+                        if type(f) is Aff.FlickNote:
+                            # Convert pos to note track.
+                            track = getNearestTrack(f.PosX)
+                            # Check track is invalid.
+                            # If track is uninvalid, continue.
+                            if checkEventOverlap(f.Timing,track):
+                                track = findNearAbleLane(f.Timing,track)
+                                if track == False:
+                                    continue
+                            # If track is invalid, convert it to tap note and add to list.
+                            n = Aff.TapNote()
+                            n.Timing = f.Timing
+                            n.Track = track
+                            AllTaps.append(n)
+                            Taps.append(n)
+
+                # Final, we need set note value to group.
+                group.Arcs.clear()
+                group.Flicks.clear()
+                group.Taps = Taps
+                group.Holds = Holds
+        # Write chart to file.
+        Aff.AffWriter.WriteEvents(Aff.AffWriter,outPath,chart)
+        print("\n文件已写入\n")
+
     # There is Functions for edit Aff chart
 
     def Func_AffPathToShadow():
-        if option.UseCustomForcePath == True:
-            filePath = option.FilePath
-            outPath = option.OutPath
-        else:
-            filePath = input("\n输入文件路径:\n").replace("\\","/")
-            outPath = input("\n输入输出路径:\n").replace("\\","/")
+        paths = FileUtil.GetInputPath()
+        filePath = paths[0]
+        outPath = paths[1]
         AffUtil.ConvertAffPathToShadow(AffUtil, filePath, outPath)
 
     def Func_Mirror():
-        if option.UseCustomForcePath == True:
-            filePath = option.FilePath
-            outPath = option.OutPath
-        else:
-            filePath = input("\n输入文件路径:\n").replace("\\","/")
-            outPath = input("\n输入输出路径:\n").replace("\\","/")
+        paths = FileUtil.GetInputPath()
+        filePath = paths[0]
+        outPath = paths[1]
         AffUtil.MirrorAllNotes(AffUtil, filePath, outPath)
 
     def Func_Reverse():
-        if option.UseCustomForcePath == True:
-            filePath = option.FilePath
-            outPath = option.OutPath
-        else:
-            filePath = input("\n输入文件路径:\n").replace("\\","/")
-            outPath = input("\n输入输出路径:\n").replace("\\","/")
+        paths = FileUtil.GetInputPath()
+        filePath = paths[0]
+        outPath = paths[1]
         AffUtil.ReverseAllNotes(AffUtil, filePath, outPath)
+
+    def Func_ToKey():
+        paths = FileUtil.GetInputPath()
+        filePath = paths[0]
+        outPath = paths[1]
+        AffUtil.ConvertToKey(AffUtil, filePath, outPath)
+
+AffUtil.ConvertAffPathToShadow(AffUtil,r'F:\ForTwirdora\TwirEditor\Datas\2.ex',r'F:\ForTwirdora\TwirEditor\Datas\output.txt')

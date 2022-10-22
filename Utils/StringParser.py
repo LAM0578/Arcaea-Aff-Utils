@@ -32,7 +32,7 @@ class StringParser:
 
     def ReadBool(self, ternimator = None):
         end = self.base.find(ternimator, self.pos) if ternimator != None else (int(len(self.base)) - 1)
-        value = bool(self.base[self.pos:end].lower() == "true")
+        value = self.base[self.pos:end].lower() == "true"
         self.pos += (end - self.pos + 1)
         return value
 

@@ -2,7 +2,8 @@ from Easing.Easings import*
 from Easing.EasingUtil import* 
 from Aff.TimingUtil import*
 from Aff.AffCameraUtil import*
-import re
+from Aff.VoidMaker import*
+import os
 
 class UtilCore:
     callCount = 0
@@ -14,21 +15,12 @@ class UtilCore:
             print("编辑 AffOption.py 来修改选项\n")
         s = input()
         if s == "/quit":
-            return
+            os._exit(0)
         if s == "/help":
             UtilCore.Help()
             unknown = False
         if s == "/ease tips":
             EasingUtil.GetTips()
-            unknown = False
-        if re.match("/ease (calc|value) (\d+(\.?)(\d+)?) (\d+(\.?)(\d+)?) (\d+(\.?)(\d+)?) (\d+)", s):
-            m0arr = s.replace("/ease", "").replace("calc ", "").replace("value ", "").split(" ")
-            min = float(m0arr[1])
-            max = float(m0arr[2])
-            size = float(m0arr[3])
-            ease = int(m0arr[4])
-            result = EasingUtil.CalcValue(min, max, size, ease)
-            print(result)
             unknown = False
         if s == "/affutil easetiming":
             AffTimingUtil.Func_GetTimings()
@@ -54,13 +46,18 @@ class UtilCore:
         if s == "/affutil convert0":
             AffCameraUtil.Func_ConvertFlickToCameras()
             unknown = False
+        if s == "/affutil convert1":
+            AffUtil.Func_ToKey()
+            unknown = False
+        if s == "/affutil voidmaker":
+            voidMaker.Func_ConvertToVoid()
+            unknown = False
         if unknown == True:
-            print("未知指令，使用 /help 展示帮助列表\n")
+            print(u"未知指令，使用 /help 展示帮助列表\n")
         UtilCore.callCount += 1
         UtilCore.Main()
 
     def Help():
-        i = 0
         # Help list
         arr = [
             "",
@@ -69,7 +66,6 @@ class UtilCore:
             "",
             "Ease 缓动帮助:",
             "    /ease tips - 展示缓动类型 ID",
-            "    /ease <calc或value> <最小值:Float> <最大值:Float> <0-1:Float> <0-30:Int> - 计算对应点的值",
             "",
             "Aff 拓展指令:",
             "    /affutil easetiming - 获取缓动 Timing 列表",
@@ -80,11 +76,11 @@ class UtilCore:
             "    /affutil affmirror - 镜像谱面",
             "    /affutil affreverse - 颠倒谱面",
             "    /affutil convert0 - Flick 转换 Camera 移动事件",
+            "    /affutil convert1 - 将谱面转换为键盘谱 注意: 比较试验性, 慎用!",
+            "    /affutil voidmaker -  将谱面转换为由黑线构成的\"虚空\"谱面",
             "",
         ]
-        count = len(arr)
-        while i < count:
-            print(arr[i])
-            i += 1
+        for a in arr:
+            print(a)
 
 UtilCore.Main()

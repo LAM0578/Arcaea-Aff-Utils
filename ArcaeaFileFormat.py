@@ -100,6 +100,12 @@ class EventGroup:
         self.Cameras = []
         self.SceneControls = []
 
+    def ClearAllNotes(self):
+        self.Taps = []
+        self.Holds = []
+        self.Arcs = []
+        self.Flicks = []
+
 
 class Chart:
     def __init__(self, filePath: str = None):
@@ -334,7 +340,7 @@ class AffWriter:
                         if j != len(group.TimingGroupAttributes) - 1:
                             attributes += "_"
                         j += 1
-                    file.writelines("timinggroup({0}){{".format(attributes))
+                    file.writelines("timinggroup({0}){{\n".format(attributes))
 
                 # Write event to file
 
