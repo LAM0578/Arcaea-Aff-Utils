@@ -83,4 +83,5 @@ class UtilCore:
         for a in arr:
             print(a)
 
-UtilCore.Main()
+if __name__ == '__main__':
+    UtilCore.Main()

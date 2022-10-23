@@ -674,26 +674,3 @@ class voidMaker:
         voidMaker.__convertToVoid(path[0],path[1])
         print("\n文件已写入\n")
 
-
-voidMaker._voidMaker__convertToVoid(r'F:\ForTwirdora\TwirEditor\Datas\2.ex',r'F:\ForTwirdora\TwirEditor\Datas\output.txt')
-
-raise Exception('Break.')
-# test
-def getStr(n:Aff.ArcNote):
-    return f'arc({n.Timing},{n.EndTiming},{round(n.StartX,2)},{round(n.EndX,2)},{n.LineType},{round(n.StartY,2)},{round(n.EndY,2)},{n.Color},{n.FxName},{n.IsTrace.__str__().lower()});'
-model = voidModels([])
-flick = Aff.FlickNote()
-flick.Timing = 1200
-deg = 45
-rad = math.radians(deg)
-flick.VecX = math.sin(rad)
-flick.VecY = math.cos(rad)
-print(math.degrees(math.atan2(flick.VecX,flick.VecY)))
-lst = [getStr(n) for n in model.flickModel(flick)]
-f = open('F:/adetest/2.aff', 'w')
-f.writelines('AudioOffset:0\n')
-f.writelines('-\n')
-f.writelines('timing(0,100.00,4.00);\n')
-f.writelines(f'flick({flick.Timing},{flick.PosX},{flick.PosY},{flick.VecX},{flick.VecY});\n')
-f.writelines(str('\n').join(lst))
-f.close()

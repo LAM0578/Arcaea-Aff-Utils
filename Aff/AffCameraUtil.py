@@ -85,3 +85,4 @@ class AffCameraUtil:
         resetonend = arr[2].lower() == "true"
         useresettype = arr[3].lower() == "true"
         duration = int(arr[4])
+        AffCameraUtil.GetFlickOffsetMove(filepath,outpath,offset,easing,resetonend,useresettype,duration)
