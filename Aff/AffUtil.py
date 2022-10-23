@@ -703,5 +703,3 @@ class AffUtil:
         filePath = paths[0]
         outPath = paths[1]
         AffUtil.ConvertToKey(AffUtil, filePath, outPath)
-
-AffUtil.ConvertAffPathToShadow(AffUtil,r'F:\ForTwirdora\TwirEditor\Datas\2.ex',r'F:\ForTwirdora\TwirEditor\Datas\output.txt')
