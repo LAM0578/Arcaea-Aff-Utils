@@ -8,6 +8,9 @@ Arcaea 谱面编辑辅助工具
 
 # 更新日志
 
+> 2022/11/17
+- 修复了 VoidModels 中的 ArcModel 部分 Arc 错位的问题
+
 > 2022/10/22
 - 添加了 VoidMaker
 - 修复了部分 bug

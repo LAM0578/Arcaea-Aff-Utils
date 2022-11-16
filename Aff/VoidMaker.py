@@ -100,7 +100,7 @@ class voidModels:
             note.EndX = point_End.x
             note.StartY = point_start.y
             note.EndY = point_End.y
-            return note
+            return copy(note)
 
         if n.IsTrace:
             a = deepcopy(n)
@@ -127,6 +127,16 @@ class voidModels:
             bodyPoint_left_y = Vec2(point_start_left.y, point_end_left.y)
             bodyPoint_mid_y = Vec2(point_start_mid.y, point_end_mid.y)
             bodyPoint_right_y = Vec2(point_start_right.y, point_end_right.y)
+            # BodyPoints
+            # Left
+            body_left_start = Vec2(bodyPoint_left_x.x, bodyPoint_left_y.x)
+            body_left_end = Vec2(bodyPoint_left_x.y, bodyPoint_left_y.y)
+            # Mid
+            body_mid_start = Vec2(bodyPoint_mid_x.x, bodyPoint_mid_y.x)
+            body_mid_end = Vec2(bodyPoint_mid_x.y, bodyPoint_mid_y.y)
+            # Right
+            body_right_start = Vec2(bodyPoint_right_x.x, bodyPoint_right_y.x)
+            body_right_end = Vec2(bodyPoint_right_x.y, bodyPoint_right_y.y)
             # endregion
             # Body
             # If duration != 0, build body.
@@ -145,13 +155,13 @@ class voidModels:
                 arc.IsTrace = True
                 # Body left
                 result.append(assignArcPoints(arc,\
-                    Vec2(bodyPoint_left_x.x,bodyPoint_left_y.x),Vec2(bodyPoint_left_x.y,bodyPoint_left_y.y)))
+                    body_left_start, body_left_end))
                 # Body Mid
                 result.append(assignArcPoints(arc,\
-                    Vec2(bodyPoint_mid_x.x,bodyPoint_mid_x.y),Vec2(bodyPoint_mid_y.x,bodyPoint_mid_y.y)))
+                    body_mid_start, body_mid_end))
                 # Body Right
                 result.append(assignArcPoints(arc,\
-                    Vec2(bodyPoint_right_x.x,bodyPoint_right_y.x),Vec2(bodyPoint_right_x.y,bodyPoint_right_y.y)))
+                    body_right_start, body_right_end))
             # End
             # Assign arc
             arc = Aff.ArcNote()
@@ -160,10 +170,10 @@ class voidModels:
             arc.IsTrace = True
             # End Segment Left
             result.append(assignArcPoints(arc,\
-                    Vec2(point_end_mid.x,point_end_left.x),Vec2(point_end_mid.y,point_end_left.y)))
+                    point_end_mid, point_end_left))
             # End Segment Right
             result.append(assignArcPoints(arc,\
-                    Vec2(point_end_mid.x,point_end_right.x),Vec2(point_end_mid.y,point_end_right.y)))
+                    point_end_mid, point_end_right))
             # End Segment Right
             # Height
             # If start y = end y = 0.2, builded void height is point.
@@ -546,7 +556,7 @@ class voidModels:
         return result
 
     def flickModel(self, n: Aff.FlickNote) -> list:
-        print('This module is abandoned.')
+        print('This method is abandoned.')
         return []
         result = []
         # Vector to deg.
@@ -673,4 +683,3 @@ class voidMaker:
         path = FileUtil.GetInputPath()
         voidMaker.__convertToVoid(path[0],path[1])
         print("\n文件已写入\n")
-
